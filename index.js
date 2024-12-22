@@ -78,8 +78,8 @@ async function run() {
       const email = req.decoded.email;
       const query = { email: email };
       const user = await userCollection.findOne(query);
-      const isBuyer = user?.role === 'buyer';
-      if (!isBuyer) {
+      const isSeller = user?.role === 'seller';
+      if (!isSeller) {
         return res.status(403).send({ message: 'Forbidden access' });
       }
       next();
@@ -128,7 +128,7 @@ async function run() {
       res.send(result);
     });
 
-    app.put("/users/admin/:id", verifyToken, verifyAdmin, async (req, res) => {
+    app.patch("/users/admin/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updatedDoc = {
@@ -141,11 +141,6 @@ async function run() {
     });
 
     //------------------ Seller Related API ------------------
-
-    app.get('/users', verifyToken, verifySeller, async (req, res) => {
-      const result = await userCollection.find().toArray();
-      res.send(result);
-    });
 
     app.get('/users/seller/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
@@ -163,7 +158,7 @@ async function run() {
       res.send({ seller });
     });
 
-    app.put("/users/seller/:id", verifyToken, verifySeller, async (req, res) => {
+    app.patch("/users/seller/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updatedDoc = {
@@ -180,6 +175,7 @@ async function run() {
 
     app.post('/product', async (req, res) => {
       const newProduct = req.body;
+      newProduct.creator = req.query.email; // Set the creator field based on the authenticated user
       const result = await productCollection.insertOne(newProduct);
       res.send(result);
     });
