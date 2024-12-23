@@ -11,13 +11,12 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 
 app.use(cors({
   origin: [
-    'http://localhost:5173',
-    // 'http://localhost:5174',
-    // 'https://online-gift-shop-a4212.web.app',
-    // 'https://online-gift-shop.netlify.app'
+    ' https://online-camera-shop-f0d45.web.app', // Note: extra space before URL
+    'http://localhost:5173'
   ],
   credentials: true
 }));
+
 
 app.use(express.json());
 
@@ -247,13 +246,13 @@ async function run() {
       const existingWishlistProduct = await wishlistCollection.findOne(query);
 
       if (existingWishlistProduct) {
-      return res.status(400).send({ message: 'Product already in wishlist' });
+        return res.status(400).send({ message: 'Product already in wishlist' });
       }
 
       const result = await wishlistCollection.insertOne(wishlistProduct);
       res.send(result);
     });
-    
+
     app.post('/wishlist', async (req, res) => {
       const wishlistProduct = req.body;
       const result = await wishlistCollection.insertOne(wishlistProduct);
@@ -275,7 +274,7 @@ async function run() {
     });
 
 
-    
+
 
     //------------------ Location Related API ------------------
 
