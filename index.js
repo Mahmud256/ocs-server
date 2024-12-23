@@ -35,6 +35,7 @@ async function run() {
 
     const productCollection = client.db("online-camera-shop").collection("product");
     const cartCollection = client.db("online-camera-shop").collection("cart");
+    const wishlistCollection = client.db("online-camera-shop").collection("wishlist");
     const userCollection = client.db("online-camera-shop").collection("users");
     const locationCollection = client.db("online-camera-shop").collection("location");
     const orderCollection = client.db("online-camera-shop").collection("manageorder");
@@ -238,6 +239,43 @@ async function run() {
       const result = await cartCollection.deleteOne(query);
       res.send(result);
     });
+
+    //------------------ Wishlist Related API ------------------
+    app.post('/wishlist', async (req, res) => {
+      const wishlistProduct = req.body;
+      const query = { email: wishlistProduct.email, productId: wishlistProduct.productId };
+      const existingWishlistProduct = await wishlistCollection.findOne(query);
+
+      if (existingWishlistProduct) {
+      return res.status(400).send({ message: 'Product already in wishlist' });
+      }
+
+      const result = await wishlistCollection.insertOne(wishlistProduct);
+      res.send(result);
+    });
+    
+    app.post('/wishlist', async (req, res) => {
+      const wishlistProduct = req.body;
+      const result = await wishlistCollection.insertOne(wishlistProduct);
+      res.send(result);
+    });
+
+    app.get('/wishlist', async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await wishlistCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.delete('/wishlist/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await wishlistCollection.deleteOne(query);
+      res.send(result);
+    });
+
+
+    
 
     //------------------ Location Related API ------------------
 
